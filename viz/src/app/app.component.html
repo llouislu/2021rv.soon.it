@@ -1,0 +1,172 @@
+<nz-layout class="layout">
+  <!-- <nz-sider
+    nzTheme="light"
+    nzCollapsible="true"
+    nzBreakpoint="lg"
+    [nzCollapsedWidth]="0"
+  >
+    <div class="logo">logo placeholder</div>
+    <ul nz-menu nzMode="inline">
+      <li nz-menu-item>
+        <a href="#timeline"><span>Timeline</span></a>
+      </li>
+      <li nz-menu-item>
+        <a href="#approval-and-people"><span>Approval & People</span></a>
+      </li>
+      <li nz-menu-item>
+        <a href="#applies-and-people"><span>Applies & People </span></a>
+      </li>
+    </ul>
+  </nz-sider> -->
+  <nz-layout>
+    <nz-content>
+      <div class="inner-content">
+        <header>
+          <h1 nz-typography>Charting 2021 Resident Visa Processing</h1>
+          <nz-divider
+            nzPlain
+            nzText="Data updated to {{ lastUpdateDate }}"
+            nzOrientation="left"
+          ></nz-divider>
+          <nz-row [nzGutter]="2" nzJustify="space-around">
+            <nz-col [nzSpan]="2"
+              ><nz-statistic
+                nzValue="{{ caseApplied | number: '1.0' }}"
+                [nzTitle]="'Case Applied'"
+              ></nz-statistic
+            ></nz-col>
+            <nz-col [nzSpan]="2">
+              <nz-statistic
+                nzValue="~{{ casePending | number: '1.0-2' }}%"
+                [nzTitle]="'Case Pending'"
+              ></nz-statistic>
+            </nz-col>
+            <nz-col [nzSpan]="2">
+              <nz-statistic
+                nzValue="{{ caseApproved | number: '1.0-2' }}%"
+                [nzTitle]="'Case Approved'"
+              ></nz-statistic>
+            </nz-col>
+            <nz-col [nzSpan]="2">
+              <nz-statistic
+                nzValue="{{ peopleApplied | number: '1.0' }}"
+                [nzTitle]="'People Applied'"
+              ></nz-statistic>
+            </nz-col>
+            <nz-col [nzSpan]="2">
+              <nz-statistic
+                nzValue="~{{ peoplePending | number: '1.0-2' }}%"
+                [nzTitle]="'People Pending'"
+              ></nz-statistic>
+            </nz-col>
+            <nz-col [nzSpan]="2">
+              <nz-statistic
+                nzValue="{{ peopleApproved | number: '1.0-2' }}%"
+                [nzTitle]="'People Approved'"
+              ></nz-statistic>
+            </nz-col>
+          </nz-row>
+          <nz-divider></nz-divider>
+          <h2 nz-typography id="timeline">Timeline & Progress</h2>
+          <nz-row nzJustify="space-around" nzAlign="middle">
+            <nz-col nzSpan="6">
+              <nz-timeline nzMode="left" [nzReverse]="true">
+                <ng-container *ngFor="let event of timelineEvents">
+                  <nz-timeline-item
+                    nzLabel="{{ toTimelineDate(event.time) }}"
+                    >{{ event.text }}</nz-timeline-item
+                  >
+                </ng-container>
+              </nz-timeline></nz-col
+            >
+            <nz-col nzSpan="12">
+              <div #caseStatusAreaChartContainer>
+                <p>Case Status: Approved vs Pending</p>
+                <ngx-charts-area-chart-stacked
+                  [view]="[caseStatusAreaChartContainer.offsetWidth, 400]"
+                  [scheme]="colorScheme"
+                  [legend]="false"
+                  [showXAxisLabel]="true"
+                  [showYAxisLabel]="true"
+                  [xAxis]="true"
+                  [yAxis]="true"
+                  xAxisLabel="Time"
+                  yAxisLabel="Percentage (%)"
+                  [timeline]="true"
+                  [results]="pendingVsApproval"
+                >
+                </ngx-charts-area-chart-stacked>
+              </div>
+            </nz-col>
+          </nz-row>
+        </header>
+        <nz-divider></nz-divider>
+        <h2 nz-typography id="approval-and-people">Approvals & People</h2>
+        <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
+          <nz-col [nzSpan]="10">
+            <app-linechart
+              chartId="ca"
+              title="Case Approvals"
+              yName="CumulativeAppr"
+              vName="DailyAppr"
+            ></app-linechart
+          ></nz-col>
+          <nz-col [nzSpan]="10">
+            <app-candlechart
+              chartId="cam"
+              title="Case Approval Speed (zero-approval days excluded)"
+              ma="12:#EDB183,26:#F15152"
+              [interval]="5"
+            >
+            </app-candlechart>
+          </nz-col>
+        </nz-row>
+        <nz-divider></nz-divider>
+        <h2 nz-typography id="applies-and-people">Applies & People</h2>
+        <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
+          <nz-col [nzSpan]="10">
+            <app-linechart
+              chartId="cl"
+              title="Case Applied"
+              yName="CumulativeApp"
+              vName="DailyApp"
+            ></app-linechart>
+          </nz-col>
+          <nz-col [nzSpan]="10">
+            <app-linechart
+              chartId="pa"
+              title="People Applied"
+              yName="CumulativePpl"
+              vName="DailyPpl"
+            ></app-linechart>
+          </nz-col>
+        </nz-row>
+      </div>
+    </nz-content>
+    <nz-footer style="font-size: x-small">
+      <p>
+        2021rv.soon.it &copy; {{ copyRightYear }}, licensed under
+        <a
+          target="_blank"
+          href="http://creativecommons.org/licenses/by-nd/3.0/nz/"
+          >CC-BY-ND 3.0 NZ</a
+        >, with <a href="/3rdpartylicenses.txt">third party software</a>.
+      </p>
+      <p>
+        The original 2021 Resident Visa processing data is authored and licensed
+        by
+        <a
+          target="_blank"
+          href="https://www.immigration.govt.nz/new-zealand-visas/waiting-for-a-visa/how-long-it-takes-to-process-your-visa-application/2021-resident-visa-processing-times"
+          >Immigration New Zealand</a
+        >
+        under
+        <a
+          target="_blank"
+          href="https://www.immigration.govt.nz/about-us/site-information/copyright"
+          >CC-BY 3.0 NZ</a
+        >.
+      </p>
+    </nz-footer>
+  </nz-layout>
+</nz-layout>

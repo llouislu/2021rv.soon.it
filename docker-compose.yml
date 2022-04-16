@@ -1,0 +1,23 @@
+version: '3'
+services:
+  inz:
+    build: "./inz_data_scraper/"
+    container_name: "inz"
+    hostname: "inz"
+    volumes:
+      - ./data:/data
+      - ./inz_data_scraper:/app
+    ports:
+      - 4444:80
+  viz:
+    build: "./viz/"
+    container_name: "viz"
+    hostname: "viz"
+    volumes:
+      - ./data:/data
+      - ./viz:/app
+    ports:
+      - 4200:4200
+      - 4000:4000
+    depends_on:
+      - inz

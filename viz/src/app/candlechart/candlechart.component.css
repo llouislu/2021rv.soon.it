@@ -1,0 +1,20 @@
+.chart {
+  padding: auto 3%;
+  min-width: 400px;
+  width: 100%;
+  overflow: auto;
+  font-family: "gustan-extrabold", "arial", "冬青黑体", "Hiragino Sans GB",
+    "黑体", "SimHei", sans-serif;
+}
+
+.legend {
+  position: relative;
+  float: left;
+  left: 12px;
+  top: 12px;
+  z-index: 1000;
+}
+
+.legend > div {
+  display: inline;
+}
