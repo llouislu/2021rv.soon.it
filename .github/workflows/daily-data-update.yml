@@ -1,0 +1,39 @@
+name: daily-data-updates
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  push:
+    branches:
+      - dev-cron
+
+jobs:
+  docker:
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+    # default working folder is $GITHUB_WORKSPACE
+
+    steps:
+      - name: Checkout master branch for scraper
+        uses: actions/checkout@v3
+
+      - name: Run scraper
+        run: |
+          docker-compose -f docker-compose.yml run inz --one-off
+          cp data/2021rv.json /tmp/2021rv.json
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: "gh-pages"
+
+      - name: Update new data
+        run: |
+          cp /tmp/2021rv.json assets/
+          ls -lsa
+
+      - name: Publish to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        with:
+          branch: gh-pages
+          folder: .

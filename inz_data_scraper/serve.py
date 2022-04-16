@@ -136,10 +136,13 @@ def worker():
     logger.info(f"updated inz at {datetime.now()}")
 
 
-def main():
+def main(argv):
     logger.info("Running immediate update")
     worker()
     logger.info("Has run immediate update")
+
+    if len(argv) > 1 and argv[1] in ["--one-off", "-1"]:
+        exit(0)
 
     schedule.every().day.at("05:00").do(worker)  # UTC Time!!!
     logger.info(f"has set up scheudled runs: {schedule.get_jobs()}")
@@ -150,5 +153,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys
+
     logger.info("started")
-    main()
+    main(sys.argv)

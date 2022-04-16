@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker exec -it viz /bin/bash -c "npm run-script build"
+docker exec viz /bin/bash -c "/usr/local/bin/npm install && /usr/local/bin/npm run-script build"

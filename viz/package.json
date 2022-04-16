@@ -2,7 +2,7 @@
   "name": "viz",
   "version": "0.0.0",
   "scripts": {
-    "ng": "/app/ng/node_modules/.bin/ng",
+    "ng": "./node_modules/.bin/ng",
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build --configuration production --common-chunk",
     "watch": "ng build --watch --configuration development",

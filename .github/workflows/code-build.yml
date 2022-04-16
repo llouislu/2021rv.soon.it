@@ -1,0 +1,34 @@
+name: full-build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  docker:
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d --build
+
+      - name: Build Angular for production
+        run: bash viz_build_prod.sh
+
+      - name: Publish to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        with:
+          branch: gh-pages
+          folder: ./viz/dist/viz/
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
