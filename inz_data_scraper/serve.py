@@ -4,6 +4,7 @@ from datetime import datetime
 import time
 import json
 import logging
+import sys
 
 import requests
 from poppler import load_from_data
@@ -13,7 +14,6 @@ import schedule
 URL = "https://www.immigration.govt.nz/documents/other-resources/2021-resident-visa-processing.pdf"
 
 logging.basicConfig(
-    filename="/data/inz_data-updater.log",
     level=logging.DEBUG,
     format="%(levelname)s:%(asctime)s:%(name)s:L%(lineno)s:%(funcName)s():%(message)s ",
 )
@@ -153,7 +153,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    import sys
-
     logger.info("started")
     main(sys.argv)
