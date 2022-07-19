@@ -7,11 +7,12 @@ import logging
 import sys
 
 import requests
-from poppler import load_from_data
+from bs4 import BeautifulSoup
+import pandas as pd
 import schedule
 
 
-URL = "https://www.immigration.govt.nz/documents/other-resources/2021-resident-visa-processing.pdf"
+URL = "https://www.immigration.govt.nz/new-zealand-visas/waiting-for-a-visa/how-long-it-takes-to-process-your-visa-application/2021-resident-visa-processing-times"
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -69,69 +70,74 @@ def download() -> bytes:
     chunks = []
     try:
         r = requests.get(URL)
-        if r.status_code == 200:
-            for chunk in r.iter_content(1024):
-                chunks.append(chunk)
     except Exception as e:
         logger.error(f"download failed")
     else:
-        return b"".join(chunks)
+        return r.text
 
 
-def pdf_to_text(pdf_bytes: bytes) -> str:
-    pdf_document = load_from_data(pdf_bytes)
-    logger.info(f"PDF metadata - {pdf_document.infos()}")
-    page_texts = []
-    for page_idx in range(0, pdf_document.pages):
-        page = pdf_document.create_page(page_idx)
-        page_texts.append(page.text())
+def find_data_table(html_str: str) -> dict:
+    COLUMN_MAP = {
+        "Week ending": "time",
+        "Total applications received": "aply",
+        "Total number of people included": "aply_people",
+        "Applications approved and visas\xa0issued": "appr",  # farrk this white space
+        "People approved and issued visas": "appr_people",
+        "Declined Failed Instructions": "decl",
+    }
 
-    return "\n".join(page_texts)
+    bs = BeautifulSoup(html_str, features="html.parser")
+    table: str = str(bs.find("table").extract())
+
+    # get first table
+    dfs = pd.read_html(table)
+    df = dfs[0]
+
+    # skip first row of total statistics
+    df.drop(df.index[0], inplace=True)
+    df.head()
+
+    # rename table columns
+    logger.debug(df.columns)
+    logger.debug("renaming columns")
+    df.rename(columns=COLUMN_MAP, inplace=True)
+    logger.debug(df.columns)
+
+    # convert date type
+    df["time"] = df["time"].apply(pd.to_datetime, errors="raise", format=r"%d %B %Y")
+
+    # sort by date descendingly
+    df.sort_values(by="time", ascending=False, inplace=True)
+
+    # re-format date to YYYY-MM-DD
+    df["time"] = df["time"].dt.strftime(r"%Y-%m-%d")
+
+    # to convert a list of table rows and output a dict
+    # https://stackoverflow.com/a/29815523
+    return df.T.to_dict().values()
 
 
 def update_inz() -> dict:
-    pdf_file_bytes = download()
-    # with open("test.pdf", "wb") as f:
-    #     f.write(pdf_file_bytes)
+    html_str = download()
+    rows = find_data_table(html_str)
 
-    pdf_text = pdf_to_text(pdf_file_bytes)
+    logger.debug(rows)
 
-    rows = []
     dict_rows = []
-    logger.debug("showing first and last 20 rows of parsed PDF")
-    lines = pdf_text.split("\n")
-    for line_no, line in enumerate(lines, 1):
-        if line_no <= 20 or (len(lines) + 1 - 20 <= line_no <= len(lines) + 1):
-            logger.debug(f"L{line_no}\t{line}")
 
-        line = line.strip()
-        line = line.replace(",", "")
-        if not detect_table_data_row(line):
+    for row in rows:
+        if row["time"].lower() == "total":
             continue
 
-        row = parse_table_row(line)
-        rows.append(row)
+        dict_rows.append(row)
 
-        time, aply, aply_people, appr, appr_people, decl = row
-        dict_rows.append(
-            {
-                "time": time,
-                "aply": aply,
-                "aply_people": aply_people,
-                "appr": appr,
-                "appr_people": appr_people,
-                "decl": decl,
-            }
-        )
-
-    logger.info(f"got rows - {rows}")
-    logger.info(f"converted to dict rows - {dict_rows}")
     return dict_rows
 
 
 def worker():
     logger.info(f"updating inz at {datetime.now()}")
     json_dict = update_inz()
+    logger.info("writing new data json.")
     json.dump(json_dict, open("/data/2021rv.json", "w"))
     logger.info(f"updated inz at {datetime.now()}")
 
