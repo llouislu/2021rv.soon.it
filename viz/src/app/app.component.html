@@ -28,38 +28,38 @@
             nzText="Data updated to {{ lastUpdateDate }}"
             nzOrientation="left"
           ></nz-divider>
-          <nz-row [nzGutter]="2" nzJustify="space-around">
-            <nz-col [nzSpan]="2"
+          <nz-row nzJustify="space-around">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2"
               ><nz-statistic
                 nzValue="{{ caseApplied | number: '1.0' }}"
                 [nzTitle]="'Case Applied'"
               ></nz-statistic
             ></nz-col>
-            <nz-col [nzSpan]="2">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2">
               <nz-statistic
                 nzValue="~{{ casePending | number: '1.0-2' }}%"
                 [nzTitle]="'Case Pending'"
               ></nz-statistic>
             </nz-col>
-            <nz-col [nzSpan]="2">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2">
               <nz-statistic
                 nzValue="{{ caseApproved | number: '1.0-2' }}%"
                 [nzTitle]="'Case Approved'"
               ></nz-statistic>
             </nz-col>
-            <nz-col [nzSpan]="2">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2">
               <nz-statistic
                 nzValue="{{ peopleApplied | number: '1.0' }}"
                 [nzTitle]="'People Applied'"
               ></nz-statistic>
             </nz-col>
-            <nz-col [nzSpan]="2">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2">
               <nz-statistic
                 nzValue="~{{ peoplePending | number: '1.0-2' }}%"
                 [nzTitle]="'People Pending'"
               ></nz-statistic>
             </nz-col>
-            <nz-col [nzSpan]="2">
+            <nz-col [nzXs]="12" [nzSm]="8" [nzLg]="2">
               <nz-statistic
                 nzValue="{{ peopleApproved | number: '1.0-2' }}%"
                 [nzTitle]="'People Approved'"
@@ -69,19 +69,25 @@
           <nz-divider></nz-divider>
           <h2 nz-typography id="timeline">Timeline & Progress</h2>
           <nz-row nzJustify="space-around" nzAlign="middle">
-            <nz-col nzSpan="6">
+            <nz-col [nzXs]="24" [nzLg]="8">
               <nz-timeline nzMode="left" [nzReverse]="true">
                 <ng-container *ngFor="let event of timelineEvents">
                   <nz-timeline-item
                     nzLabel="{{ toTimelineDate(event.time) }}"
                     >{{ event.text }}</nz-timeline-item
                   >
-                </ng-container>
-              </nz-timeline></nz-col
-            >
-            <nz-col nzSpan="12">
+                  <ng-template>
+                    <i
+                      nz-icon
+                      nzType="clock-circle-o"
+                      style="font-size: 16px"
+                    ></i>
+                  </ng-template>
+                </ng-container> </nz-timeline
+            ></nz-col>
+            <nz-col [nzXs]="22" [nzLg]="10">
               <div #caseStatusAreaChartContainer>
-                <p>Case Status: Approved vs Pending</p>
+                <p>Progress: Approved vs Pending</p>
                 <ngx-charts-area-chart-stacked
                   [view]="[caseStatusAreaChartContainer.offsetWidth, 400]"
                   [scheme]="colorScheme"
@@ -103,7 +109,7 @@
         <nz-divider></nz-divider>
         <h2 nz-typography id="approval-and-people">Approvals & People</h2>
         <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
-          <nz-col [nzSpan]="10">
+          <nz-col [nzXs]="24" [nzLg]="10">
             <app-linechart
               chartId="ca"
               title="Case Approvals"
@@ -111,7 +117,7 @@
               vName="DailyAppr"
             ></app-linechart
           ></nz-col>
-          <nz-col [nzSpan]="10">
+          <nz-col [nzXs]="24" [nzLg]="10">
             <app-candlechart
               chartId="cam"
               title="Case Approval Speed (zero-approval days excluded)"
@@ -124,7 +130,7 @@
         <nz-divider></nz-divider>
         <h2 nz-typography id="applies-and-people">Applies & People</h2>
         <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
-          <nz-col [nzSpan]="10">
+          <nz-col [nzXs]="24" [nzLg]="10">
             <app-linechart
               chartId="cl"
               title="Case Applied"
@@ -132,7 +138,7 @@
               vName="DailyApp"
             ></app-linechart>
           </nz-col>
-          <nz-col [nzSpan]="10">
+          <nz-col [nzXs]="24" [nzLg]="10">
             <app-linechart
               chartId="pa"
               title="People Applied"
