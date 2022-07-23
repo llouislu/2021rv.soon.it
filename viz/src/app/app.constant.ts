@@ -29,6 +29,13 @@ export const TIMELINE_MARKERS: SeriesMarker<Time>[] = [
     shape: "arrowDown",
     text: "Phase 2 Processes",
   },
+  {
+    time: "2022-08-01" as Time,
+    position: "aboveBar",
+    color: "orangered",
+    shape: "arrowDown",
+    text: "Application Closed",
+  },
 ];
 
 export const CHART_HEIGHT: number = 400;
