@@ -69,7 +69,7 @@
           <nz-divider></nz-divider>
           <h2 nz-typography id="timeline">Timeline & Progress</h2>
           <nz-row nzJustify="space-around" nzAlign="middle">
-            <nz-col [nzXs]="24" [nzLg]="8">
+            <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
               <nz-timeline nzMode="left" [nzReverse]="true">
                 <ng-container *ngFor="let event of timelineEvents">
                   <nz-timeline-item
@@ -85,7 +85,7 @@
                   </ng-template>
                 </ng-container> </nz-timeline
             ></nz-col>
-            <nz-col [nzXs]="22" [nzLg]="10">
+            <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
               <div #caseStatusAreaChartContainer>
                 <p>Progress: Approved vs Pending</p>
                 <ngx-charts-area-chart-stacked
@@ -108,8 +108,8 @@
         </header>
         <nz-divider></nz-divider>
         <h2 nz-typography id="approval-and-people">Approvals & People</h2>
-        <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
-          <nz-col [nzXs]="24" [nzLg]="10">
+        <nz-row nzJustify="space-around" nzAlign="middle">
+          <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
             <app-linechart
               chartId="ca"
               title="Case Approvals"
@@ -117,7 +117,7 @@
               vName="DailyAppr"
             ></app-linechart
           ></nz-col>
-          <nz-col [nzXs]="24" [nzLg]="10">
+          <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
             <app-candlechart
               chartId="cam"
               title="Case Approval Speed (zero-approval days excluded)"
@@ -129,8 +129,8 @@
         </nz-row>
         <nz-divider></nz-divider>
         <h2 nz-typography id="applies-and-people">Applies & People</h2>
-        <nz-row [nzGutter]="2" nzJustify="space-around" nzAlign="middle">
-          <nz-col [nzXs]="24" [nzLg]="10">
+        <nz-row nzJustify="space-around" nzAlign="middle">
+          <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
             <app-linechart
               chartId="cl"
               title="Case Applied"
@@ -138,7 +138,7 @@
               vName="DailyApp"
             ></app-linechart>
           </nz-col>
-          <nz-col [nzXs]="24" [nzLg]="10">
+          <nz-col [nzXs]="22" [nzSm]="22" [nzXl]="10">
             <app-linechart
               chartId="pa"
               title="People Applied"
