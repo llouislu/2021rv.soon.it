@@ -5,6 +5,8 @@ import time
 import json
 import logging
 import sys
+from turtle import ht
+from typing import TypedDict
 
 import requests
 from bs4 import BeautifulSoup
@@ -25,6 +27,15 @@ date_pattern = re.compile(r"(\w{3} \w{3} \d{1,2})")
 
 class CurrentYear:
     value = 2022
+
+
+class DataRecord(TypedDict):
+    aply: int
+    aply_people: int
+    appr: int
+    appr_people: int
+    decl: int
+    time: str  # YYYY-MM-DD
 
 
 def detect_table_data_row(row):
@@ -78,12 +89,11 @@ def download() -> bytes:
 
 def find_data_table(html_str: str) -> dict:
     COLUMN_MAP = {
-        "Week ending": "time",
         "Total applications received": "aply",
         "Total number of people included": "aply_people",
-        "Applications approved and visas\xa0issued": "appr",  # farrk this white space
+        "Applications approved and visas issued": "appr",
         "People approved and issued visas": "appr_people",
-        "Declined Failed Instructions": "decl",
+        "Declined applications": "decl",
     }
 
     bs = BeautifulSoup(html_str, features="html.parser")
@@ -93,45 +103,72 @@ def find_data_table(html_str: str) -> dict:
     dfs = pd.read_html(table)
     df = dfs[0]
 
-    # skip first row of total statistics
-    df.drop(df.index[0], inplace=True)
-    df.head()
+    items = df.to_dict(
+        orient="split"
+    )  # split: dict like {‘index’ -> [index], ‘columns’ -> [columns], ‘data’ -> [values]}
 
-    # rename table columns
-    logger.debug(df.columns)
-    logger.debug("renaming columns")
-    df.rename(columns=COLUMN_MAP, inplace=True)
-    logger.debug(df.columns)
-
-    # convert date type
-    df["time"] = df["time"].apply(pd.to_datetime, errors="raise", format=r"%d %B %Y")
-
-    # sort by date descendingly
-    df.sort_values(by="time", ascending=False, inplace=True)
-
-    # re-format date to YYYY-MM-DD
-    df["time"] = df["time"].dt.strftime(r"%Y-%m-%d")
-
-    # to convert a list of table rows and output a dict
-    # https://stackoverflow.com/a/29815523
-    return df.T.to_dict().values()
+    ret = {}
+    for item in items["data"]:
+        column_name = COLUMN_MAP.get(item[0])
+        ret[column_name] = item[1]
+    return ret
 
 
-def update_inz() -> dict:
+def find_date_of_update(html_str: str) -> datetime:
+    pattern = re.compile(
+        r"<p>Data valid to approximately (\d{2}:\d{2}, \d+ \w+ \d{4}).</p>"
+    )
+    matches = pattern.findall(html_str)
+    if not matches:
+        raise ValueError("no date of update found.")
+    return datetime.strptime(matches[0], r"%H:%M, %d %B %Y")
+
+
+def http_get_last_2021rv_json() -> str:
+    r = requests.get(
+        "https://raw.githubusercontent.com/llouislu/2021rv.soon.it/gh-pages/assets/2021rv.json"
+    )
+    return r.text
+
+
+def update_inz() -> list[DataRecord]:
     html_str = download()
-    rows = find_data_table(html_str)
+    row = find_data_table(html_str)
+    date_of_update: datetime = find_date_of_update(html_str)
 
-    logger.debug(rows)
+    logger.debug(row)
+    row["time"] = str(date_of_update.date())  # YYYY-MM-DD
 
-    dict_rows = []
+    # get old data
+    original_json_str = http_get_last_2021rv_json()
+    logger.debug(original_json_str)
+    original_json_dict: list(dict) = json.loads(original_json_str)
+    logger.debug("original data from website")
+    original_df = pd.read_json(original_json_str)
 
-    for row in rows:
-        if row["time"].lower() == "total":
+    # calculate increments from totals on web
+    if row["time"] == str(original_df["time"].max()):
+        logger.info("data not updated - skip update")
+        return original_json_dict
+
+    new_row = {}
+    for col, val in row.items():
+        if col == "time":
+            new_row[col] = val
             continue
+        new_row[col] = int(val) - int(original_df[col].sum())  # avoid pandas int64
+    updated_json_dict = []
+    updated_json_dict.append(new_row)
+    updated_json_dict.extend(original_json_dict)
 
-        dict_rows.append(row)
+    updated_json_dict.sort(
+        reverse=True, key=lambda e: datetime.strptime(e["time"], r"%Y-%m-%d")
+    )
 
-    return dict_rows
+    logger.debug("updated data")
+    logger.debug(updated_json_dict)
+
+    return updated_json_dict
 
 
 def worker():

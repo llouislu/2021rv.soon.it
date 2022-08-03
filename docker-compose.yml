@@ -9,6 +9,8 @@ services:
       - ./inz_data_scraper:/app
     ports:
       - 4444:80
+    # for debug
+    # entrypoint: ["tail", "-f", "/dev/null"]
   viz:
     build: "./viz/"
     container_name: "viz"
