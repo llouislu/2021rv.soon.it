@@ -5,7 +5,6 @@ import time
 import json
 import logging
 import sys
-from turtle import ht
 from typing import TypedDict
 
 import requests
