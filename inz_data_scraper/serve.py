@@ -6,6 +6,7 @@ import json
 import logging
 import sys
 from typing import TypedDict
+import unicodedata
 
 import requests
 from bs4 import BeautifulSoup
@@ -83,7 +84,8 @@ def download() -> bytes:
     except Exception as e:
         logger.error(f"download failed")
     else:
-        return r.text
+        # normalize white spaces - \xa0 again!!!
+        return unicodedata.normalize("NFKC", r.text)
 
 
 def find_data_table(html_str: str) -> dict:
@@ -115,7 +117,7 @@ def find_data_table(html_str: str) -> dict:
 
 def find_date_of_update(html_str: str) -> datetime:
     pattern = re.compile(
-        r"<p>Data valid to approximately (\d{2}:\d{2}, \d+ \w+ \d{4}).</p>"
+        "<p>Data valid to approximately (\d{2}:\d{2}, \d+ \w+ \d{4}).</p>"
     )
     matches = pattern.findall(html_str)
     if not matches:
