@@ -117,7 +117,7 @@ def find_data_table(html_str: str) -> dict:
 
 def find_date_of_update(html_str: str) -> datetime:
     pattern = re.compile(
-        "<p>Data valid to approximately (\d{2}:\d{2}, \d+ \w+ \d{4}).</p>"
+        "<p>Data valid as of approximately (\d{2}:\d{2}, \d+ \w+ \d{4}).</p>"
     )
     matches = pattern.findall(html_str)
     if not matches:
