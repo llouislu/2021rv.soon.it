@@ -7,7 +7,7 @@ RUN mkdir ~/.npm-global
 RUN npm config set prefix '~/.npm-global'
 RUN npm cache clean -force
 
-RUN npm install -g @angular/cli
+RUN NPM_CONFIG_PREFIX=~/.npm-global npm install -g @angular/cli
 WORKDIR /app
 
 ENTRYPOINT [ "bash", "/app/start_dev.sh" ]
