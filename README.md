@@ -3,8 +3,7 @@
 [https://2021rv.soon.it](https://2021rv.soon.it)
 
 [![Daily Date Update Check](https://github.com/llouislu/2021rv.soon.it/workflows/daily-data-updates/badge.svg)](https://github.com/llouislu/2021rv.soon.it/actions/workflows/daily-data-update.yml)
-[![Code Build Check](https://github.com/llouislu/2021rv.soon.it/workflows/full-build/badge.svg)](https://github.com/llouislu/2021rv.soon.it/actions/workflows/code-build.yml)
-
+[![Code Build Check](https://github.com/llouislu/2021rv.soon.it/actions/workflows/code-build.yml/badge.svg)](https://github.com/llouislu/2021rv.soon.it/actions/workflows/code-build.yml)
 # Development
 
 ## Prerequisites
