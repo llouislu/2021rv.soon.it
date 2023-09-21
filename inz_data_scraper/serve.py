@@ -16,6 +16,9 @@ import schedule
 
 URL = "https://www.immigration.govt.nz/new-zealand-visas/waiting-for-a-visa/how-long-it-takes-to-process-your-visa-application/2021-resident-visa-processing-times"
 
+HTTP_HEADER = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+}
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(levelname)s:%(asctime)s:%(name)s:L%(lineno)s:%(funcName)s():%(message)s ",
@@ -80,7 +83,10 @@ def parse_table_row(row):
 def download() -> bytes:
     chunks = []
     try:
-        r = requests.get(URL)
+        r = requests.get(
+            URL,
+            headers=HTTP_HEADER,
+        )
     except Exception as e:
         logger.error(f"download failed")
     else:
@@ -127,13 +133,16 @@ def find_date_of_update(html_str: str) -> datetime:
 
 def http_get_last_2021rv_json() -> str:
     r = requests.get(
-        "https://raw.githubusercontent.com/llouislu/2021rv.soon.it/gh-pages/assets/2021rv.json"
+        "https://raw.githubusercontent.com/llouislu/2021rv.soon.it/gh-pages/assets/2021rv.json",
+        headers=HTTP_HEADER,
     )
     return r.text
 
 
 def update_inz() -> list[DataRecord]:
     html_str = download()
+    logger.debug("html_str")
+    logger.debug(html_str)
     row = find_data_table(html_str)
     date_of_update: datetime = find_date_of_update(html_str)
 
