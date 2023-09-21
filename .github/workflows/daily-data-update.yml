@@ -1,3 +1,8 @@
+# 2023-09-21
+# this NO LONGER works as github action worker IP gets CAPTCHA
+# see this run
+# https://github.com/llouislu/2021rv.soon.it/actions/runs/6258415395/job/16992386894
+
 name: daily-data-updates
 
 on:
